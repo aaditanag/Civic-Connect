@@ -62,23 +62,34 @@ const ReportIssue = () => {
     }));
   };
 
+  const categoryToDepartment = {
+    "Potholes & Roads":       "Public Works",
+    "Street Lighting":        "Electricity",
+    "Garbage & Sanitation":   "Sanitation",
+    "Water Supply":           "Water Department",
+    "Drainage Issues":        "Water Department",
+    "Parks & Public Spaces":  "Public Works",
+    "Traffic Signals":        "Electricity",
+    "Illegal Construction":   "Public Works",
+    "Other":                  "Public Works"
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Convert form data to API format
+      const department = categoryToDepartment[formData.category] || "Public Works";
       const issueData = {
         title: formData.title,
         description: formData.description,
         category: formData.category,
         location: { address: formData.location },
-        urgency: formData.urgency
+        urgency: formData.urgency,
+        department
       };
 
-      // If you have image upload, you'd handle it here
-      const response = await issueService.createIssue(issueData);
-      
+      await issueService.createIssue(issueData);
       alert("Issue reported successfully!");
       navigate("/");
     } catch (error) {
@@ -90,23 +101,27 @@ const ReportIssue = () => {
   };
 
   return (
-    <div className="min-h-screen bg-indian-lightGreen py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-block mb-4">
-            <span className="text-indian-green hover:text-green-800">← Back to Home</span>
-          </Link>
-          <h1 className="text-3xl font-bold text-indian-green mb-2">Report an Issue</h1>
-          <p className="text-gray-600">Help improve your community by reporting civic issues</p>
+    <div className="page-bg font-outfit">
+      {/* Page Header */}
+      <div className="bg-civic-navy py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="gold-line" />
+          <h1 className="text-3xl font-black text-white">Report an Issue</h1>
+          <p className="text-white/50 text-sm mt-1">Help improve your community by reporting civic issues</p>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="mb-6">
+          <Link to="/" className="text-civic-gold hover:text-civic-goldHover text-sm font-semibold transition-colors">← Back to Home</Link>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md p-6 border-2 border-indian-green">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Issue Title */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                Issue Title *
+              <label htmlFor="title" className="block text-sm font-semibold text-civic-navy mb-2">
+                Issue Title <span className="text-civic-gold">*</span>
               </label>
               <input
                 type="text"
@@ -116,15 +131,15 @@ const ReportIssue = () => {
                 value={formData.title}
                 onChange={handleInputChange}
                 placeholder="Brief description of the issue"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indian-green focus:border-indian-green transition-colors"
+                className="input-civic"
                 disabled={loading}
               />
             </div>
 
             {/* Category Selection */}
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                Category *
+              <label htmlFor="category" className="block text-sm font-semibold text-civic-navy mb-2">
+                Category <span className="text-civic-gold">*</span>
               </label>
               <select
                 id="category"
@@ -132,7 +147,7 @@ const ReportIssue = () => {
                 required
                 value={formData.category}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indian-green focus:border-indian-green transition-colors"
+                className="input-civic appearance-none cursor-pointer"
                 disabled={loading}
               >
                 <option value="">Select a category</option>
@@ -144,8 +159,8 @@ const ReportIssue = () => {
 
             {/* Description */}
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                Description *
+              <label htmlFor="description" className="block text-sm font-semibold text-civic-navy mb-2">
+                Description <span className="text-civic-gold">*</span>
               </label>
               <textarea
                 id="description"
@@ -155,15 +170,15 @@ const ReportIssue = () => {
                 value={formData.description}
                 onChange={handleInputChange}
                 placeholder="Please provide detailed information about the issue..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indian-green focus:border-indian-green transition-colors"
+                className="input-civic resize-none"
                 disabled={loading}
               />
             </div>
 
             {/* Location */}
             <div>
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
-                Location *
+              <label htmlFor="location" className="block text-sm font-semibold text-civic-navy mb-2">
+                Location <span className="text-civic-gold">*</span>
               </label>
               <div className="flex gap-2 mb-2">
                 <input
@@ -174,18 +189,18 @@ const ReportIssue = () => {
                   value={formData.location}
                   onChange={handleInputChange}
                   placeholder="Street address or landmark"
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indian-green focus:border-indian-green transition-colors"
+                  className="input-civic flex-1"
                   disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={handleUseCurrentLocation}
                   disabled={loading || locationLoading}
-                  className={`px-4 py-2 bg-indian-green text-white rounded-lg text-sm font-medium transition-colors ${
-                    loading || locationLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-800'
+                  className={`btn-secondary px-4 py-2.5 rounded-xl text-sm whitespace-nowrap ${
+                    loading || locationLoading ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
-                  {locationLoading ? 'Getting...' : '📍 Use Current Location'}
+                  {locationLoading ? 'Getting...' : '📍 My Location'}
                 </button>
               </div>
               {locationError && (
@@ -204,154 +219,95 @@ const ReportIssue = () => {
 
             {/* Urgency Level */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Urgency Level *
+              <label className="block text-sm font-semibold text-civic-navy mb-2">
+                Urgency Level <span className="text-civic-gold">*</span>
               </label>
               <div className="grid grid-cols-3 gap-4">
-                <label className={`flex flex-col items-center p-3 border-2 rounded-lg cursor-pointer transition-colors ${
-                  formData.urgency === 'low' 
-                    ? 'border-indian-green bg-indian-lightGreen' 
-                    : 'border-gray-300 hover:border-indian-green'
-                } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                  <input
-                    type="radio"
-                    name="urgency"
-                    value="low"
-                    checked={formData.urgency === 'low'}
-                    onChange={handleInputChange}
-                    className="sr-only"
-                    disabled={loading}
-                  />
-                  <span className="text-2xl">🟢</span>
-                  <span className="text-sm font-medium">Low</span>
-                  <span className="text-xs text-gray-500">Minor issue</span>
-                </label>
-
-                <label className={`flex flex-col items-center p-3 border-2 rounded-lg cursor-pointer transition-colors ${
-                  formData.urgency === 'medium' 
-                    ? 'border-indian-green bg-indian-lightGreen' 
-                    : 'border-gray-300 hover:border-indian-green'
-                } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                  <input
-                    type="radio"
-                    name="urgency"
-                    value="medium"
-                    checked={formData.urgency === 'medium'}
-                    onChange={handleInputChange}
-                    className="sr-only"
-                    disabled={loading}
-                  />
-                  <span className="text-2xl">🟡</span>
-                  <span className="text-sm font-medium">Medium</span>
-                  <span className="text-xs text-gray-500">Moderate issue</span>
-                </label>
-
-                <label className={`flex flex-col items-center p-3 border-2 rounded-lg cursor-pointer transition-colors ${
-                  formData.urgency === 'high' 
-                    ? 'border-indian-green bg-indian-lightGreen' 
-                    : 'border-gray-300 hover:border-indian-green'
-                } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                  <input
-                    type="radio"
-                    name="urgency"
-                    value="high"
-                    checked={formData.urgency === 'high'}
-                    onChange={handleInputChange}
-                    className="sr-only"
-                    disabled={loading}
-                  />
-                  <span className="text-2xl">🔴</span>
-                  <span className="text-sm font-medium">High</span>
-                  <span className="text-xs text-gray-500">Emergency</span>
-                </label>
+                {[{value:'low',icon:'🟢',label:'Low',sub:'Minor issue'},{value:'medium',icon:'🟡',label:'Medium',sub:'Moderate'},{value:'high',icon:'🔴',label:'High',sub:'Emergency'}].map(opt => (
+                  <label key={opt.value} className={`flex flex-col items-center p-4 border-2 rounded-2xl cursor-pointer transition-all duration-200 ${
+                    formData.urgency === opt.value
+                      ? 'border-civic-gold bg-civic-gold/10 shadow-md'
+                      : 'border-gray-200 hover:border-civic-gold/50'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    <input type="radio" name="urgency" value={opt.value} checked={formData.urgency === opt.value} onChange={handleInputChange} className="sr-only" disabled={loading} />
+                    <span className="text-2xl mb-1">{opt.icon}</span>
+                    <span className="text-sm font-bold text-civic-navy">{opt.label}</span>
+                    <span className="text-xs text-gray-400">{opt.sub}</span>
+                  </label>
+                ))}
               </div>
             </div>
 
             {/* Image Upload */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Upload Photo (Optional)
+              <label className="block text-sm font-semibold text-civic-navy mb-2">
+                Upload Photo <span className="text-gray-400 font-normal">(Optional)</span>
               </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+              <div className="border-2 border-dashed border-gray-200 hover:border-civic-gold/50 rounded-2xl p-8 text-center transition-colors">
                 {formData.image ? (
                   <div>
-                    <img 
-                      src={URL.createObjectURL(formData.image)} 
-                      alt="Preview" 
-                      className="mx-auto h-32 object-cover rounded-lg mb-4"
-                    />
-                    <p className="text-sm text-gray-600">{formData.image.name}</p>
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, image: null }))}
-                      className="text-red-600 text-sm mt-2"
-                      disabled={loading}
-                    >
+                    <img src={URL.createObjectURL(formData.image)} alt="Preview" className="mx-auto h-36 object-cover rounded-xl mb-3 shadow-md" />
+                    <p className="text-sm text-gray-500 mb-2">{formData.image.name}</p>
+                    <button type="button" onClick={() => setFormData(prev => ({ ...prev, image: null }))} className="text-red-500 hover:text-red-600 text-sm font-semibold transition-colors" disabled={loading}>
                       Remove Image
                     </button>
                   </div>
                 ) : (
                   <div>
-                    <div className="w-12 h-12 bg-indian-lightGreen rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-xl">📸</span>
+                    <div className="w-14 h-14 rounded-2xl bg-civic-gold/10 flex items-center justify-center mx-auto mb-3">
+                      <span className="text-2xl">📸</span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">Drag & drop or click to upload</p>
-                    <label htmlFor="image-upload" className={`bg-indian-green text-white px-4 py-2 rounded-lg text-sm cursor-pointer inline-block ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    <p className="text-sm text-gray-400 mb-3">Drag & drop or click to upload</p>
+                    <label htmlFor="image-upload" className={`btn-secondary text-sm cursor-pointer inline-block py-2 px-5 rounded-xl ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                       Choose File
                     </label>
-                    <input
-                      id="image-upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="sr-only"
-                      disabled={loading}
-                    />
-                    <p className="text-xs text-gray-500 mt-2">PNG, JPG up to 5MB</p>
+                    <input id="image-upload" type="file" accept="image/*" onChange={handleImageUpload} className="sr-only" disabled={loading} />
+                    <p className="text-xs text-gray-400 mt-2">PNG, JPG up to 5MB</p>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Submit Button */}
-            <div className="pt-6 border-t border-gray-200">
+            <div className="pt-6 border-t border-gray-100">
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full bg-indian-green text-white font-semibold py-3 px-6 rounded-lg text-lg transition-colors shadow-lg ${
-                  loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-800'
+                className={`btn-primary w-full py-3.5 rounded-xl text-base shadow-lg shadow-civic-gold/20 ${
+                  loading ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
                 {loading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Submitting...
-                  </div>
-                ) : (
-                  'Submit Report'
-                )}
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                    Submitting report...
+                  </span>
+                ) : 'Submit Report'}
               </button>
             </div>
           </form>
         </div>
 
         {/* Current Location Map */}
-        <div className="bg-white rounded-xl shadow-md p-6 border-2 border-indian-green mt-6">
-          <h3 className="text-lg font-semibold text-indian-green mb-4">📍 Your Current Location</h3>
-          <div className="text-sm text-gray-600 mb-2">
-            Click on the map to select your exact location for the issue report.
-          </div>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+          <h3 className="text-lg font-bold text-civic-navy mb-1">📍 Your Current Location</h3>
+          <p className="text-sm text-gray-400 mb-4">Click on the map to select your exact location for the issue report.</p>
           <CurrentLocationMap onLocationSelect={handleLocationSelect} />
         </div>
 
         {/* Additional Info */}
-        <div className="bg-white rounded-xl shadow-md p-6 border-2 border-indian-green mt-6">
-          <h3 className="text-lg font-semibold text-indian-green mb-4">📋 What happens next?</h3>
-          <div className="space-y-3 text-sm text-gray-600">
-            <p>1. Your report will be reviewed by our team</p>
-            <p>2. It will be assigned to the relevant department</p>
-            <p>3. You'll receive updates on the progress</p>
-            <p>4. The issue will be resolved as quickly as possible</p>
+        <div className="bg-civic-navy rounded-2xl p-6 mt-6">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-civic-gold mb-4">What happens next?</h3>
+          <div className="space-y-3">
+            {['Your report will be reviewed by our team', 'It will be assigned to the relevant department', "You'll receive updates on the progress", 'The issue will be resolved as quickly as possible'].map((step, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <span className="w-6 h-6 rounded-full bg-civic-gold text-civic-navy text-xs font-black flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                <span className="text-white/70 text-sm">{step}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

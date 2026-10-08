@@ -11,6 +11,9 @@ dotenv.config();
 // Import routes
 const authRoutes = require('./routes/auth');
 const issueRoutes = require('./routes/issues');
+const departmentRoutes = require('./routes/departments');
+const adminRoutes = require('./routes/admin');
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -61,6 +64,9 @@ app.post('/api/test', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/issues', issueRoutes);
+app.use('/api/departments', departmentRoutes);
+app.use('/api/admin', adminRoutes);
+
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

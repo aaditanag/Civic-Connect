@@ -5,21 +5,18 @@ const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser]     = useState(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken]   = useState(localStorage.getItem('token'));
 
   useEffect(() => {
     if (token) {
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      // Verify token and get user data
       checkAuthStatus();
     } else {
       setLoading(false);
@@ -48,26 +45,39 @@ export const AuthProvider = ({ children }) => {
       api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
       setUser(userData);
 
-      return { success: true };
+      return { success: true, user: userData };
     } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.message || 'Login failed'
-      };
+      const data = error.response?.data;
+      // Special handling for pending approval
+      if (data?.code === 'PENDING_APPROVAL') {
+        return {
+          success: false,
+          pendingApproval: true,
+          error: data.message,
+          rejectionReason: data.rejectionReason
+        };
+      }
+      return { success: false, error: data?.message || 'Login failed' };
     }
   };
 
+  // register now supports pendingApproval response from backend
   const register = async (userData) => {
     try {
       const response = await api.post('/auth/register', userData);
-      const { token: newToken, user: newUser } = response.data;
+      const { token: newToken, user: newUser, pendingApproval, message } = response.data;
+
+      // Authority accounts — no token, just pending status
+      if (pendingApproval) {
+        return { success: true, pendingApproval: true, message };
+      }
 
       localStorage.setItem('token', newToken);
       setToken(newToken);
       api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
       setUser(newUser);
 
-      return { success: true };
+      return { success: true, pendingApproval: false };
     } catch (error) {
       return {
         success: false,

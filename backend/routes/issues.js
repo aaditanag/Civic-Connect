@@ -9,7 +9,34 @@ const isMongoConnected = () => {
   return Issue.db.readyState === 1;
 };
 
+// ── GET /api/issues/public-stats ──────────────────────────────────────────
+// Public stats for the landing page
+router.get('/public-stats', async (req, res) => {
+  try {
+    if (isMongoConnected()) {
+      const User = require('../models/User'); // Need to query users for active departments
+      
+      const [issuesReported, issuesResolved, activeDepartments] = await Promise.all([
+        Issue.countDocuments(),
+        Issue.countDocuments({ status: 'resolved' }),
+        User.distinct('department', { role: 'department_staff', isApproved: true, department: { $ne: null } })
+      ]);
+
+      res.json({
+        issuesReported,
+        issuesResolved,
+        activeDepartments: activeDepartments.length
+      });
+    } else {
+      res.json({ issuesReported: 1009, issuesResolved: 414, activeDepartments: 52 }); // Dummy fallback
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Get all issues
+
 router.get('/', async (req, res) => {
   try {
     if (isMongoConnected()) {

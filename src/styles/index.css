@@ -1,29 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+@import 'leaflet/dist/leaflet.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import 'leaflet/dist/leaflet.css';
 
+/* ─── Root / Base ─────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    font-family: 'Outfit', 'Inter', sans-serif;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #F0EDE6;
+    color: #1B2A4A;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* ─── Map ─────────────────────────────────────────────────── */
 .leaflet-container {
   height: 100%;
   width: 100%;
 }
 
-/* Custom component styles with Indian colors */
+/* ─── Component Classes ───────────────────────────────────── */
 @layer components {
+
+  /* Buttons */
   .btn-primary {
-    @apply bg-indian-green hover:bg-green-800 text-white font-medium py-2 px-4 rounded-lg transition-colors;
+    @apply bg-civic-gold hover:bg-civic-goldHover text-civic-navy font-semibold py-2 px-5 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
   }
-  
   .btn-secondary {
-    @apply bg-indian-saffron hover:bg-orange-500 text-white font-medium py-2 px-4 rounded-lg transition-colors;
+    @apply bg-civic-navy hover:bg-civic-navyDark text-white font-semibold py-2 px-5 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
   }
-  
   .btn-outline {
-    @apply border-2 border-indian-green text-indian-green hover:bg-indian-green hover:text-white font-medium py-2 px-4 rounded-lg transition-colors;
+    @apply border-2 border-civic-gold text-civic-gold hover:bg-civic-gold hover:text-civic-navy font-semibold py-2 px-5 rounded-lg transition-all duration-200;
   }
-  
+  .btn-outline-white {
+    @apply border-2 border-white text-white hover:bg-white hover:text-civic-navy font-semibold py-2 px-5 rounded-lg transition-all duration-200;
+  }
+
+  /* Cards */
   .card {
-    @apply bg-white rounded-xl shadow-md p-6;
+    @apply bg-white rounded-2xl shadow-md p-6;
+  }
+  .card-navy {
+    @apply bg-civic-navyCard rounded-2xl shadow-md p-6 text-white;
+  }
+  .card-hover {
+    @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-xl;
+  }
+
+  /* Status Badges */
+  .badge-pending    { @apply bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-semibold border border-amber-300; }
+  .badge-progress   { @apply bg-blue-100  text-blue-800  px-3 py-1 rounded-full text-xs font-semibold border border-blue-300; }
+  .badge-resolved   { @apply bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-semibold border border-emerald-300; }
+  .badge-closed     { @apply bg-gray-100  text-gray-700  px-3 py-1 rounded-full text-xs font-semibold border border-gray-300; }
+
+  /* Priority Badges */
+  .badge-high   { @apply bg-red-100    text-red-700    px-3 py-1 rounded-full text-xs font-semibold border border-red-300; }
+  .badge-medium { @apply bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold border border-orange-300; }
+  .badge-low    { @apply bg-green-100  text-green-700  px-3 py-1 rounded-full text-xs font-semibold border border-green-300; }
+
+  /* Inputs */
+  .input-civic {
+    @apply w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-civic-gold focus:outline-none focus:ring-2 focus:ring-civic-gold/20 transition-all duration-200 font-outfit bg-white text-civic-navy placeholder-gray-400;
+  }
+  .input-navy {
+    @apply w-full px-4 py-3 rounded-xl border-2 border-white/20 focus:border-civic-gold focus:outline-none bg-white/10 text-white placeholder-white/50 transition-all duration-200;
+  }
+
+  /* Section titles */
+  .section-title {
+    @apply text-3xl font-bold text-civic-navy mb-2;
+  }
+  .section-subtitle {
+    @apply text-gray-500 text-base mb-10;
+  }
+
+  /* Page wrapper */
+  .page-bg {
+    @apply min-h-screen bg-civic-cream;
+  }
+
+  /* Gold divider line */
+  .gold-line {
+    @apply inline-block w-12 h-1 bg-civic-gold rounded-full mb-4;
+  }
+
+  /* Stat card */
+  .stat-card {
+    @apply bg-civic-navyCard rounded-2xl p-6 flex flex-col items-start gap-2 text-white;
+  }
+  .stat-number {
+    @apply text-4xl font-black text-civic-gold;
+  }
+  .stat-label {
+    @apply text-sm text-white/70 font-medium;
   }
 }
+
+/* ─── Animations ──────────────────────────────────────────── */
+@keyframes counterUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-counter { animation: counterUp 0.5s ease-out forwards; }
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, #F0EDE6 25%, #E5E0D5 50%, #F0EDE6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ─── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: #F0EDE6; }
+::-webkit-scrollbar-thumb { background: #1B2A4A; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #F5A623; }

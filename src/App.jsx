@@ -7,6 +7,7 @@ import Footer from './components/common/Footer';
 import Home from './pages/Home';
 import CitizenView from './pages/CitizenView';
 import AdminView from './pages/AdminView';
+import DepartmentView from './pages/DepartmentView';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
@@ -17,7 +18,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-indian-lightGreen flex flex-col">
+        <div className="min-h-screen bg-civic-cream flex flex-col font-outfit">
           <Header />
           <main className="flex-grow">
             <Routes>
@@ -26,6 +27,7 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/dashboard" element={<ProtectedRoute><CitizenView /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><AdminView /></ProtectedRoute>} />
+              <Route path="/department" element={<ProtectedRoute><DepartmentView /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/report" element={<ProtectedRoute><ReportIssue /></ProtectedRoute>} />
             </Routes>

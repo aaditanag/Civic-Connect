@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+const REGIONS = [
+  'Bangalore', 'Delhi', 'Mumbai', 'Chennai',
+  'Hyderabad', 'Kolkata', 'Pune', 'Jaipur',
+  'Ahmedabad', 'Surat', 'Lucknow', 'Nagpur'
+];
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -25,10 +31,51 @@ const userSchema = new mongoose.Schema({
     enum: ['citizen', 'admin', 'department_staff'],
     default: 'citizen'
   },
+  // ── Department staff specific fields ──────────────────────
   department: {
     type: String,
     enum: ['Public Works', 'Sanitation', 'Water Department', 'Electricity', null],
     default: null
+  },
+  region: {
+    type: String,
+    enum: [...REGIONS, null],
+    default: null
+  },
+  // Official government employee ID (e.g. KA-SAN-2024-0042)
+  employeeId: {
+    type: String,
+    trim: true,
+    default: null
+  },
+  // Official designation/title (e.g. "Senior Sanitation Officer")
+  designation: {
+    type: String,
+    trim: true,
+    default: null
+  },
+  // ── Approval workflow ──────────────────────────────────────
+  // Citizens & admin auto-approved; department_staff starts false
+  isApproved: {
+    type: Boolean,
+    default: true
+  },
+  rejectionReason: {
+    type: String,
+    default: null
+  },
+  approvedAt: {
+    type: Date,
+    default: null
+  },
+  approvedBy: {
+    type: String,
+    default: null
+  },
+  // ── Common fields ─────────────────────────────────────────
+  phone: {
+    type: String,
+    trim: true
   },
   location: {
     address: String,
@@ -36,10 +83,6 @@ const userSchema = new mongoose.Schema({
       lat: Number,
       lng: Number
     }
-  },
-  phone: {
-    type: String,
-    trim: true
   },
   isActive: {
     type: Boolean,
@@ -61,7 +104,7 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Create model only if mongoose is connected
+// Create model safely
 let User;
 try {
   User = mongoose.model('User');
@@ -70,3 +113,4 @@ try {
 }
 
 module.exports = User;
+module.exports.REGIONS = REGIONS;
